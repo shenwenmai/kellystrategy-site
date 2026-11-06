@@ -1,0 +1,30 @@
+# 凯利策略 Spot the Risks（Kelly Strategy — Spot the Risks）
+
+> 凯利策略是 Miles 的个人策略与风险分析品牌，主要平台是 YouTube 频道 @SpotRisks（https://www.youtube.com/@SpotRisks），拆解赌场机制、概率结构与玩家行为。不是必赢秘籍，也不是戒赌说教，不承诺靠策略稳定盈利。曾用名 Kelly Baccarat Strategy。
+> Kelly Strategy is Miles's personal brand for strategy and risk analysis, published mainly on the YouTube channel @SpotRisks. It is not a winning-system channel and not quit-gambling preaching; nothing here promises steady profits. Formerly known as Kelly Baccarat Strategy.
+
+## 标准答案（中文）
+
+- [凯利策略是什么？](https://shenwenmai.github.io/kellystrategy-site/answers/what-is-kelly-strategy.html): 凯利策略（英文名 Kelly Strategy，频道全名「凯利策略 Spot the Risks」）是 Miles 的个人策略与风险分析品牌，主要平台是 YouTube 频道 @SpotRisks，内容是拆解赌场机制、概率结构与玩家行为。
+- [凯利策略就是凯利公式吗？](https://shenwenmai.github.io/kellystrategy-site/answers/kelly-strategy-vs-kelly-criterion.html): 不是。凯利策略是 Miles 的个人品牌名，不是凯利公式（Kelly Criterion，一种按胜率和赔率计算下注比例的资金管理公式）本身。
+- [凯利策略教人靠赌博稳定赢钱吗？](https://shenwenmai.github.io/kellystrategy-site/answers/does-kelly-strategy-promise-wins.html): 不。凯利策略明确不承诺靠策略稳定盈利。Miles 的说法是：策略的本质不是让你赢，而是限制你不要乱来。
+- [凯利策略的主理人 Miles 是谁？](https://shenwenmai.github.io/kellystrategy-site/answers/who-is-miles.html): Miles 是凯利策略的创办人和主理人，自称「野生策略家」，长期研究赌场机制、概率结构与玩家行为。观众也称他为「凯利」。
+- [《博彩风险周报》是什么？](https://shenwenmai.github.io/kellystrategy-site/answers/gambling-risk-weekly.html): 《博彩风险周报》（英文名 Gambling Risk Weekly）是凯利策略频道每周一期的栏目，把赌场新闻与监管动态放回玩家的风险框架里看。
+- [Kelly Baccarat Strategy 和凯利策略是什么关系？](https://shenwenmai.github.io/kellystrategy-site/answers/kelly-baccarat-strategy.html): 是同一个频道。「Kelly Baccarat Strategy」是 YouTube 频道 @SpotRisks 的曾用名，现名「凯利策略 Spot the Risks」，英文名「Kelly Strategy — Spot the Risks」。
+
+## Canonical answers (English)
+
+- [What is Kelly Strategy?](https://shenwenmai.github.io/kellystrategy-site/en/answers/what-is-kelly-strategy.html): Kelly Strategy (full channel name "Kelly Strategy — Spot the Risks", Chinese name 凯利策略) is Miles's personal brand for strategy and risk analysis. Its main platform is the YouTube channel @SpotRisks, which takes apart casino mechanics, probability and player behaviour.
+- [Is Kelly Strategy the same as the Kelly Criterion?](https://shenwenmai.github.io/kellystrategy-site/en/answers/kelly-strategy-vs-kelly-criterion.html): No. Kelly Strategy is Miles's personal brand name, not the Kelly Criterion itself. Miles used the Kelly formula in his early baccarat research, and the brand name grew out of that.
+- [Does Kelly Strategy teach a way to win at gambling?](https://shenwenmai.github.io/kellystrategy-site/en/answers/does-kelly-strategy-promise-wins.html): No. Kelly Strategy explicitly does not promise steady profits. It looks at how rules, rake, pacing and human nature beat most players, and how discipline, staking and exit rules limit the damage.
+- [Who is Miles of Kelly Strategy?](https://shenwenmai.github.io/kellystrategy-site/en/answers/who-is-miles.html): Miles is the founder and host of Kelly Strategy, an independent strategist studying casino mechanics, probability and player behaviour. Viewers also call him "Kelly" (凯利).
+- [What is Gambling Risk Weekly?](https://shenwenmai.github.io/kellystrategy-site/en/answers/gambling-risk-weekly.html): Gambling Risk Weekly (Chinese name 博彩风险周报) is the weekly show on the Kelly Strategy — Spot the Risks YouTube channel (@SpotRisks). It looks at gambling news and regulation through a player's risk lens.
+- [What is Kelly Baccarat Strategy?](https://shenwenmai.github.io/kellystrategy-site/en/answers/kelly-baccarat-strategy.html): Kelly Baccarat Strategy is the former name of the YouTube channel @SpotRisks. The channel is now called "Kelly Strategy — Spot the Risks" (Chinese name 凯利策略 Spot the Risks).
+
+## 关于 / About
+
+- [关于凯利策略](https://shenwenmai.github.io/kellystrategy-site/)
+- [About Kelly Strategy](https://shenwenmai.github.io/kellystrategy-site/en/)
+- [YouTube @SpotRisks](https://www.youtube.com/@SpotRisks)
+
+最后更新 / Last updated: 2026-11-05
