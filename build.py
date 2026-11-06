@@ -7,6 +7,7 @@
 """
 import html
 import json
+import re
 import os
 from datetime import date
 from urllib.parse import urlparse
@@ -153,7 +154,7 @@ def shell(lang, title, desc, path, body, preview=False, zh_path="/", en_path="/e
     """preview=True 时输出 artifact 用的片段（无 doctype/head），并显示草稿提示条。
     zh_path / en_path：本页的中英对应页，用于语言互链（hreflang）。ld：本页结构化数据，缺省为品牌实体。"""
     url = SITE_URL + path
-    other = en_path if lang == "zh" else zh_path
+    other = (en_path or "/en/") if lang == "zh" else zh_path
     nav_label = "English" if lang == "zh" else "中文"
     hl = "zh-Hans" if lang == "zh" else "en"
     ld = ld or schema(lang)
@@ -162,7 +163,7 @@ def shell(lang, title, desc, path, body, preview=False, zh_path="/", en_path="/e
 <meta name="author" content="Miles（凯利策略）">{'<meta name="robots" content="noindex">' if NOINDEX else ''}
 <link rel="canonical" href="{url}">
 <link rel="alternate" hreflang="zh-Hans" href="{SITE_URL}{zh_path}">
-<link rel="alternate" hreflang="en" href="{SITE_URL}{en_path}">
+{f'<link rel="alternate" hreflang="en" href="{SITE_URL}{en_path}">' if en_path else ''}
 <link rel="alternate" hreflang="x-default" href="{SITE_URL}{zh_path}">
 <link rel="alternate" type="text/plain" title="llms.txt" href="{SITE_URL}/llms.txt">
 <meta property="og:type" content="website">
@@ -500,8 +501,9 @@ def robots():
     return f"User-agent: *\nAllow: /\n\n{blocks}\nSitemap: {SITE_URL}/sitemap.xml\n"
 
 
-def llms_txt():
+def llms_txt(issues=()):
     """llms.txt：给 AI 读的站点说明（社区提案格式，非官方标准）。"""
+    wk = "\n".join(f"- [博彩风险周报 #{m['num']}：{m['title']}]({SITE_URL}/weekly/{m['num']}.html): {m['question']}" for m in issues)
     zh = "\n".join(f"- [{a['zh_q']}]({SITE_URL}/answers/{a['slug']}.html): {a['zh_a']}" for a in ANSWERS)
     en = "\n".join(f"- [{a['en_q']}]({SITE_URL}/en/answers/{a['slug']}.html): {a['en_a']}" for a in ANSWERS)
     return f"""# 凯利策略 Spot the Risks（Kelly Strategy — Spot the Risks）
@@ -517,6 +519,10 @@ def llms_txt():
 
 {en}
 
+## 博彩风险周报（Gambling Risk Weekly，每周一期，主持人 Miles）
+
+{wk}
+
 ## 关于 / About
 
 - [关于凯利策略]({SITE_URL}/)
@@ -529,6 +535,103 @@ def llms_txt():
 
 BASE = urlparse(SITE_URL).path.rstrip("/")  # 临时网址带子路径时，站内链接要加前缀
 
+# ── 博彩风险周报文章 ─────────────────────────────────────
+# 来源：content/weekly/NNN.md（Muse 撰写，审计员机审+事实抽查后发布）。
+# HOLD 内的期号暂不发布，并写明原因。
+HOLD = {"001": "10 月 20 日澳门配码案未能核实原始报道，待 Muse 提供来源链接"}
+SERIES = {"@type": "CreativeWorkSeries", "name": "博彩风险周报", "alternateName": "Gambling Risk Weekly",
+          "url": SITE_URL + "/answers/gambling-risk-weekly.html"}
+
+
+def load_weekly():
+    import glob
+    out = []
+    for f in sorted(glob.glob(os.path.join(ROOT, "content", "weekly", "[0-9][0-9][0-9].md"))):
+        num = os.path.basename(f)[:3]
+        if num in HOLD:
+            continue
+        raw = open(f, encoding="utf-8").read()
+        _, fm, body = raw.split("---", 2)
+        meta = {}
+        for line in fm.strip().splitlines():
+            k, v = line.split(":", 1)
+            meta[k.strip()] = v.strip()
+        meta["tags"] = [t.strip() for t in meta["tags"].strip("[]").split(",")]
+        meta["num"] = num
+        meta["body"] = body.strip()
+        meta["vid"] = meta["youtube"].split("v=")[1]
+        out.append(meta)
+    return sorted(out, key=lambda m: m["num"], reverse=True)
+
+
+def md_inline(t):
+    t = e(t)
+    t = re.sub(r"\*\*(.+?)\*\*", r"<b>\1</b>", t)
+    t = re.sub(r"\[([^\]]+)\]\((https?://[^)]+)\)", r'<a href="\2">\1</a>', t)
+    return t
+
+
+def md_to_html(md):
+    parts = []
+    for block in re.split(r"\n\s*\n", md):
+        block = block.strip()
+        if not block:
+            continue
+        if block.startswith("## "):
+            parts.append(f"<h2>{md_inline(block[3:])}</h2>")
+        else:
+            parts.append("<p>" + "<br>".join(md_inline(l) for l in block.splitlines()) + "</p>")
+    return "\n".join(parts)
+
+
+def weekly_ld(m):
+    url = f"{SITE_URL}/weekly/{m['num']}.html"
+    data = {
+        "@context": "https://schema.org",
+        "@graph": [
+            {
+                "@type": "Article", "url": url, "headline": m["title"], "description": m["question"],
+                "inLanguage": "zh-Hans", "datePublished": m["date"], "dateModified": UPDATED.isoformat(),
+                "author": {"@id": SITE_URL + "/#miles"}, "publisher": {"@id": SITE_URL + "/#brand"},
+                "isPartOf": SERIES, "keywords": m["tags"],
+                "video": {"@type": "VideoObject", "name": m["title"], "description": m["question"],
+                          "url": m["youtube"], "embedUrl": f"https://www.youtube.com/embed/{m['vid']}",
+                          "thumbnailUrl": f"https://i.ytimg.com/vi/{m['vid']}/hqdefault.jpg",
+                          "uploadDate": m["date"]},
+            },
+            {"@type": "Organization", "@id": SITE_URL + "/#brand", "name": "凯利策略 Spot the Risks",
+             "url": SITE_URL + "/", "sameAs": [YOUTUBE, X_URL]},
+            {"@type": "Person", "@id": SITE_URL + "/#miles", "name": "Miles",
+             "alternateName": ["凯利策略", "Kelly Strategy"], "sameAs": [YOUTUBE, X_URL]},
+        ],
+    }
+    return json.dumps(data, ensure_ascii=False, indent=2)
+
+
+def weekly_body(m, all_issues):
+    others = "".join(f'<li><a href="/weekly/{o["num"]}.html">#{o["num"]}　{e(o["title"])}</a></li>'
+                     for o in all_issues if o is not m)
+    more = f'<section><h2>往期</h2><ul class="cols">{others}</ul></section>' if others else ""
+    return f"""<article>
+  <p class="eyebrow">博彩风险周报 #{m['num']} · {m['date']}</p>
+  <h1>{e(m['title'])}</h1>
+  <section class="weekly">{md_to_html(m['body'])}</section>
+  <p><iframe width="100%" style="aspect-ratio:16/9;max-width:100%;border:0" src="https://www.youtube-nocookie.com/embed/{m['vid']}" title="{e(m['title'])}" loading="lazy" allowfullscreen></iframe></p>
+</article>
+{more}"""
+
+
+def weekly_list(issues):
+    if not issues:
+        return ""
+    items = "".join(f'<li><a href="/weekly/{m["num"]}.html"><b>#{m["num"]}</b>　{e(m["title"])}</a></li>' for m in issues)
+    return f"""
+<section>
+  <h2>博彩风险周报</h2>
+  <ul class="cols">{items}</ul>
+</section>"""
+
+
 
 def write(path, text):
     if BASE and path.endswith(".html") and not path.startswith("preview/"):
@@ -540,7 +643,8 @@ def write(path, text):
 
 
 def main():
-    write("docs/index.html", shell("zh", ZH_TITLE, ZH_DESC, "/", zh_body(False) + faq_list("zh")))
+    issues = load_weekly()
+    write("docs/index.html", shell("zh", ZH_TITLE, ZH_DESC, "/", zh_body(False) + weekly_list(issues) + faq_list("zh")))
     write("docs/en/index.html", shell("en", EN_TITLE, EN_DESC, "/en/", en_body(False) + faq_list("en")))
     pairs = [("/", "/en/")]
     for a in ANSWERS:
@@ -551,13 +655,19 @@ def main():
         write(f"docs{ep}", shell("en", a["en_q"] + " | Kelly Strategy", a["en_a"], ep, qa_body(a, "en", False),
                                            zh_path=zp, en_path=ep, ld=qa_ld(a, "en")))
     write("docs/robots.txt", robots())
-    write("docs/llms.txt", llms_txt())
+    write("docs/llms.txt", llms_txt(issues))
+    for m in issues:
+        wp = f"/weekly/{m['num']}.html"
+        write(f"docs{wp}", shell("zh", f"{m['title']}｜博彩风险周报 #{m['num']}｜凯利策略", m["question"], wp,
+                                 weekly_body(m, issues), zh_path=wp, en_path=None, ld=weekly_ld(m)))
     items = []
     for zp, ep in pairs:
         for path in (zp, ep):
             alts = (f'\n    <xhtml:link rel="alternate" hreflang="zh-Hans" href="{SITE_URL}{zp}"/>'
                     f'\n    <xhtml:link rel="alternate" hreflang="en" href="{SITE_URL}{ep}"/>')
             items.append(f"  <url>\n    <loc>{SITE_URL}{path}</loc>\n    <lastmod>{UPDATED.isoformat()}</lastmod>{alts}\n  </url>")
+    for m in issues:
+        items.append(f"  <url>\n    <loc>{SITE_URL}/weekly/{m['num']}.html</loc>\n    <lastmod>{UPDATED.isoformat()}</lastmod>\n  </url>")
     write("docs/sitemap.xml",
           '<?xml version="1.0" encoding="UTF-8"?>\n'
           '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n'
