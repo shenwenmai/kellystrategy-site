@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kelly Strategy — Spot the Risks</title>
+<meta name="description" content="Kelly Strategy | A strategist&#x27;s channel on casino practice and risk structure. Not a winning-system channel, and not quit-gambling preaching.">
+<meta name="author" content="Miles（凯利策略）"><meta name="robots" content="noindex">
+<link rel="canonical" href="https://shenwenmai.github.io/kellystrategy-site/en/">
+<link rel="alternate" hreflang="zh-Hans" href="https://shenwenmai.github.io/kellystrategy-site/">
+<link rel="alternate" hreflang="en" href="https://shenwenmai.github.io/kellystrategy-site/en/">
+<link rel="alternate" hreflang="x-default" href="https://shenwenmai.github.io/kellystrategy-site/">
+<link rel="alternate" type="text/plain" title="llms.txt" href="https://shenwenmai.github.io/kellystrategy-site/llms.txt">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="凯利策略 Spot the Risks">
+<meta property="og:title" content="Kelly Strategy — Spot the Risks">
+<meta property="og:description" content="Kelly Strategy | A strategist&#x27;s channel on casino practice and risk structure. Not a winning-system channel, and not quit-gambling preaching.">
+<meta property="og:url" content="https://shenwenmai.github.io/kellystrategy-site/en/">
+<meta property="og:locale" content="en_US">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://shenwenmai.github.io/kellystrategy-site/#brand",
+      "name": "凯利策略 Spot the Risks",
+      "alternateName": [
+        "Kelly Strategy — Spot the Risks",
+        "Kelly Strategy",
+        "Kelly Baccarat Strategy"
+      ],
+      "url": "https://shenwenmai.github.io/kellystrategy-site/",
+      "founder": {
+        "@id": "https://shenwenmai.github.io/kellystrategy-site/#miles"
+      },
+      "sameAs": [
+        "https://www.youtube.com/@SpotRisks",
+        "https://x.com/WenMaiSun"
+      ]
+    },
+    {
+      "@type": "Person",
+      "@id": "https://shenwenmai.github.io/kellystrategy-site/#miles",
+      "name": "Miles",
+      "alternateName": [
+        "凯利策略",
+        "Kelly Strategy"
+      ],
+      "description": "Independent strategist studying casino mechanics, probability and player behaviour",
+      "url": "https://shenwenmai.github.io/kellystrategy-site/en/",
+      "sameAs": [
+        "https://www.youtube.com/@SpotRisks",
+        "https://x.com/WenMaiSun"
+      ]
+    },
+    {
+      "@type": "AboutPage",
+      "url": "https://shenwenmai.github.io/kellystrategy-site/en/",
+      "inLanguage": "en",
+      "about": {
+        "@id": "https://shenwenmai.github.io/kellystrategy-site/#brand"
+      },
+      "dateModified": "2026-11-05"
+    }
+  ]
+}
+</script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@600;700&family=Noto+Sans+SC:wght@400;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* 版式：单栏阅读页，正文约 34 个汉字宽，大字号、大留白；牌桌绿为品牌色，琥珀色只用于风险数字 */
+:root {
+  --paper: #f3f4f1;
+  --ink: #17201b;
+  --muted: #56615a;
+  --rule: #d5dad3;
+  --felt: #1f4d3a;
+  --risk: #a8661a;
+  --panel: #e8ebe5;
+  --display: "Noto Serif SC", "Songti SC", "STSong", "SimSun", serif;
+  --body: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", "Hiragino Sans GB", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #121815; --ink: #e6ebe6; --muted: #9aa69e; --rule: #2c3631;
+    --felt: #7fbf9f; --risk: #e0a254; --panel: #1a221e; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #121815; --ink: #e6ebe6; --muted: #9aa69e; --rule: #2c3631;
+  --felt: #7fbf9f; --risk: #e0a254; --panel: #1a221e; color-scheme: dark;
+}
+*, *::before, *::after { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--paper); color: var(--ink);
+  font-family: var(--body); font-size: 19px; line-height: 1.85;
+  -webkit-text-size-adjust: 100%;
+}
+.wrap {
+  max-width: 44rem; margin: 0 auto;
+  padding-left: max(20px, env(safe-area-inset-left, 0px));
+  padding-right: max(20px, env(safe-area-inset-right, 0px));
+}
+header.site { border-bottom: 1px solid var(--rule); }
+header.site .wrap {
+  display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: baseline;
+  justify-content: space-between; padding-block: 22px;
+}
+.mark { font-family: var(--display); font-size: 1.15rem; font-weight: 700; color: var(--ink); text-decoration: none; }
+.mark span { font-family: var(--mono); font-size: 0.78rem; font-weight: 500; letter-spacing: 0.08em; color: var(--felt); margin-left: 10px; text-transform: uppercase; }
+nav { display: flex; gap: 20px; font-size: 0.95rem; }
+nav a { color: var(--muted); text-decoration: none; }
+nav a:hover, nav a:focus-visible { color: var(--felt); text-decoration: underline; }
+main .wrap { padding-block: 56px 72px; display: flex; flex-direction: column; gap: 56px; }
+.eyebrow { font-family: var(--mono); font-size: 0.8rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--felt); margin: 0 0 14px; }
+h1 { font-family: var(--display); font-size: clamp(2.4rem, 7vw, 3.4rem); line-height: 1.2; margin: 0 0 18px; text-wrap: balance; }
+.lead { font-size: 1.2rem; color: var(--muted); margin: 0; }
+.stance {
+  font-family: var(--display); font-size: 1.45rem; line-height: 1.6; margin: 0;
+  padding-left: 22px; border-left: 3px solid var(--felt); text-wrap: balance;
+}
+h2 { font-family: var(--display); font-size: 1.6rem; line-height: 1.35; margin: 0 0 18px; text-wrap: balance; }
+section p { margin: 0 0 16px; }
+section p:last-child { margin-bottom: 0; }
+.edge { margin-top: 26px; background: var(--panel); border-radius: 6px; padding: 22px 24px; }
+.edge-title { font-family: var(--mono); font-size: 0.8rem; letter-spacing: 0.08em; color: var(--muted); margin: 0 0 14px; }
+.edge dl { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin: 0; }
+.edge div { min-width: 0; }
+.edge dt { font-size: 0.95rem; color: var(--muted); }
+.edge dd { margin: 2px 0 0; font-family: var(--mono); font-size: 1.7rem; font-weight: 600; color: var(--risk); font-variant-numeric: tabular-nums; }
+.edge .note { font-size: 0.85rem; color: var(--muted); margin: 14px 0 0; line-height: 1.6; }
+ul.cols { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 14px; }
+ul.cols li { padding-left: 18px; border-left: 2px solid var(--rule); }
+ul.cols b { font-weight: 700; }
+.fit { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+.fit > div { min-width: 0; }
+.fit h3 { font-size: 1.05rem; margin: 0 0 8px; }
+.fit .no h3 { color: var(--risk); }
+.fit .yes h3 { color: var(--felt); }
+.fit p { margin: 0; }
+footer.site { border-top: 1px solid var(--rule); color: var(--muted); font-size: 0.95rem; }
+footer.site .wrap { padding-block: 28px 40px; display: flex; flex-wrap: wrap; gap: 10px 28px; }
+footer a { color: var(--felt); }
+.email { user-select: all; font-family: var(--mono); font-size: 0.9rem; }
+a:focus-visible { outline: 2px solid var(--felt); outline-offset: 3px; }
+.pending { background: color-mix(in srgb, var(--risk) 16%, transparent); outline: 1px dashed var(--risk); outline-offset: 4px; border-radius: 2px; }
+.draftbar { background: var(--risk); color: var(--paper); font-size: 0.95rem; }
+.draftbar .wrap { padding-block: 12px; }
+@media (max-width: 560px) {
+  body { font-size: 18px; }
+  .edge dl, .fit { grid-template-columns: 1fr; }
+  main .wrap { gap: 44px; padding-block: 40px 56px; }
+}
+</style>
+</head>
+<body>
+
+<header class="site"><div class="wrap">
+  <a class="mark" href="/kellystrategy-site/en/">凯利策略<span>Spot the Risks</span></a>
+  <nav aria-label="Site">
+    <a href="/kellystrategy-site/" hreflang="zh-Hans">中文</a>
+    <a href="https://www.youtube.com/@SpotRisks" rel="me">YouTube</a>
+  </nav>
+</div></header>
+<main><div class="wrap">
+<section>
+  <p class="eyebrow">About Kelly Strategy</p>
+  <h1>Kelly Strategy</h1>
+  <p class="lead">A strategist's channel on casino practice and risk structure.</p>
+</section>
+
+<p class="stance">Not a winning-system channel, and not quit-gambling preaching.</p>
+
+<section>
+  <h2>Who I am</h2>
+  <p>I'm Miles, an independent strategist studying casino mechanics, probability and player behaviour. I take apart the casino's game — and the player's own game: how rules, rake, pacing and human nature beat most players, and how discipline, staking and exit rules limit the damage.</p>
+</section>
+
+<section>
+  <h2>What I track</h2>
+  <p>I also track the industry: the weekly Gambling Risk Weekly, Kelly's Case Files and Casino Black Box — gambling news and regulation through a player's risk lens.</p>
+</section>
+
+<section>
+  <h2>About the name</h2>
+  <p>'Kelly Strategy' is my personal brand for strategy and risk analysis. I used the Kelly formula in my early baccarat research; the brand is not the formula itself, and nothing here promises steady profits.</p>
+  <p>Formerly known as "Kelly Baccarat Strategy".</p>
+</section>
+
+<section>
+  <h2>Who it's for</h2>
+  <p>If you want a guaranteed way to win, this channel is not for you. If you want to see casinos — and yourself — clearly, it may be.</p>
+</section>
+<section>
+  <h2>Questions</h2>
+  <ul class="cols"><li><a href="/kellystrategy-site/en/answers/what-is-kelly-strategy.html">What is Kelly Strategy?</a></li><li><a href="/kellystrategy-site/en/answers/kelly-strategy-vs-kelly-criterion.html">Is Kelly Strategy the same as the Kelly Criterion?</a></li><li><a href="/kellystrategy-site/en/answers/does-kelly-strategy-promise-wins.html">Does Kelly Strategy teach a way to win at gambling?</a></li><li><a href="/kellystrategy-site/en/answers/who-is-miles.html">Who is Miles of Kelly Strategy?</a></li><li><a href="/kellystrategy-site/en/answers/gambling-risk-weekly.html">What is Gambling Risk Weekly?</a></li><li><a href="/kellystrategy-site/en/answers/kelly-baccarat-strategy.html">What is Kelly Baccarat Strategy?</a></li></ul>
+</section>
+</div></main>
+<footer class="site"><div class="wrap">
+  <span>YouTube：<a href="https://www.youtube.com/@SpotRisks" rel="me">youtube.com/@SpotRisks</a></span>
+  <span>Contact：<span class="email">kailicelue@gmail.com</span></span>
+  <span>Updated 2026-11-05</span>
+</div></footer>
+</body>
+</html>
