@@ -16,7 +16,7 @@ from urllib.parse import urlparse
 SITE_URL = "https://kellystrategy.org"
 # 域名绑定前为 True：所有页面加 noindex，防止临时网址被收录。绑定后改为 False
 NOINDEX = False
-UPDATED = date(2026, 11, 5)
+UPDATED = date(2026, 11, 6)
 YOUTUBE = "https://www.youtube.com/@SpotRisks"
 X_URL = "https://x.com/WenMaiSun"
 EMAIL = "kailicelue@gmail.com"
@@ -390,6 +390,25 @@ ANSWERS = [
         ],
     },
     {
+        "slug": "kelly-criterion-in-casinos", "pending": False,
+        "zh_q": "凯利公式在赌场里有用吗？",
+        "zh_a": "对百家乐这类赌场游戏，按凯利公式算出的最优下注比例是 0，也就是不该下注。凯利公式只在你拥有正期望优势时才给出正的下注比例，而百家乐的每一种下注都是负期望。",
+        "zh_more": [
+            "凯利公式（Kelly Criterion）由 John L. Kelly Jr. 于 1956 年提出：f* = (bp − q) / b。其中 b 是净赔率，p 是赢的概率，q 是输的概率，f* 是每次应投入的资金比例。",
+            "按 8 副牌标准规则计算（和局时押庄、押闲退回本金）：押庄每注期望约 −1.06%，押闲约 −1.24%，押和（赔 8 倍）约 −14.36%。三种下注算出的凯利比例都是负数。凯利比例为负，公式的结论就是不下注。",
+            "所以凯利公式不能让负期望的游戏变成稳赢。它能告诉玩家的是：在没有优势的地方，任何下注规模都只会让资金按赌场优势流失；下得越大、玩得越久，流失越多。",
+            "凯利策略 Spot the Risks 的名字来自 Miles 早期研究百家乐时用过凯利公式，但凯利策略是 Miles 的个人品牌，不是凯利公式本身，也不承诺靠策略稳定盈利。",
+        ],
+        "en_q": "Does the Kelly Criterion work in a casino?",
+        "en_a": "For casino games like baccarat, the Kelly Criterion's optimal bet size is zero: do not bet. Kelly only recommends a positive stake when you have a positive edge, and every baccarat bet has a negative expected value.",
+        "en_more": [
+            "The Kelly Criterion, published by John L. Kelly Jr. in 1956, is f* = (bp − q) / b, where b is the net odds, p the probability of winning, q the probability of losing, and f* the fraction of bankroll to stake.",
+            "Under standard 8-deck rules (Banker and Player bets push on a tie), the expected value per bet is about −1.06% on Banker, −1.24% on Player and −14.36% on Tie (paying 8 to 1). All three give a negative Kelly fraction, which means the formula says not to bet.",
+            "So the Kelly Criterion cannot turn a negative-expectation game into a winning one. What it shows is that without an edge, any bet size loses money at the house-edge rate; the bigger and longer you bet, the more you lose.",
+            "Kelly Strategy — Spot the Risks takes its name from Miles's early use of the Kelly formula in baccarat research, but the brand is not the formula itself, and nothing here promises steady profits.",
+        ],
+    },
+    {
         "slug": "not-kelly-strategy-political-consulting", "pending": False,
         "zh_q": "凯利策略 Spot the Risks 和政治咨询公司 Kelly Strategy 有关系吗？",
         "zh_a": "没有关系。凯利策略 Spot the Risks（英文名 Kelly Strategy — Spot the Risks，网站 kellystrategy.org）是 Miles 的赌场机制与风险分析品牌；网站 kellystrategy.com 上的 Kelly Strategy 是一家同名的政治咨询公司，两者是不同的实体。",
@@ -546,6 +565,7 @@ def main():
     write("docs/404.html", shell("zh", "页面不存在｜凯利策略", ZH_DESC, "/404.html",
                                  '<section><h1>页面不存在</h1><p class="lead"><a href="/">返回凯利策略首页</a></p></section>'))
     write("docs/.nojekyll", "")
+    write("docs/29993b095afd91dfd53fb317400b9764.txt", "29993b095afd91dfd53fb317400b9764")  # IndexNow 密钥文件
     write("docs/CNAME", SITE_URL.split("//")[1] + "\n")
     write("preview/about-preview.html", shell("zh", "凯利策略关于页", ZH_DESC, "/", zh_body(True) + faq_list("zh"), preview=True))
     print("built", SITE_URL)
