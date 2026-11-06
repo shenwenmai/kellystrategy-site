@@ -3,6 +3,12 @@
 > 凯利策略是 Miles 的个人策略与风险分析品牌，主要平台是 YouTube 频道 @SpotRisks（https://www.youtube.com/@SpotRisks），拆解赌场机制、概率结构与玩家行为。不是必赢秘籍，也不是戒赌说教，不承诺靠策略稳定盈利。曾用名 Kelly Baccarat Strategy。
 > Kelly Strategy is Miles's personal brand for strategy and risk analysis, published mainly on the YouTube channel @SpotRisks. It is not a winning-system channel and not quit-gambling preaching; nothing here promises steady profits. Formerly known as Kelly Baccarat Strategy.
 
+## 专题（百家乐 / 老虎机 / 赌场）
+
+- [百家乐赌场优势：押庄 1.06%、押闲 1.24%、押和 14.36%](https://kellystrategy.org/topics/baccarat.html): 百家乐三种主注都是负期望：8 副牌标准规则下，押庄（抽 5% 佣金）赌场优势 1.06%，押闲 1.24%，押和（赔 8 倍）14.36%。
+- [老虎机返还率与赢率：内华达 2025 年平均返还约 92.87%](https://kellystrategy.org/topics/slots.html): 2025 年内华达全州老虎机的赌场赢率是 7.13%，也就是玩家投进去的钱平均返还约 92.87%；面额越小，返还越低。
+- [赌场靠什么赢你：各游戏赌场优势对比](https://kellystrategy.org/topics/casino.html): 赌场靠赌场优势（house edge）赚钱：每个游戏的赔率都比真实概率略低，下注次数越多，玩家越接近这个平均损失。
+
 ## 标准答案（中文）
 
 - [凯利策略是什么？](https://kellystrategy.org/answers/what-is-kelly-strategy.html): 凯利策略（英文名 Kelly Strategy，频道全名「凯利策略 Spot the Risks」）是 Miles 的个人策略与风险分析品牌，主要平台是 YouTube 频道 @SpotRisks，内容是拆解赌场机制、概率结构与玩家行为。
