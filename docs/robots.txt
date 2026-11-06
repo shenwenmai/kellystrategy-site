@@ -37,4 +37,4 @@ Allow: /
 User-agent: CCBot
 Allow: /
 
-Sitemap: https://shenwenmai.github.io/kellystrategy-site/sitemap.xml
+Sitemap: https://kellystrategy.org/sitemap.xml
