@@ -13,9 +13,9 @@ from urllib.parse import urlparse
 
 # ── 站点配置 ─────────────────────────────────────────────
 # 域名待定（方向已定：英文品牌名 kellystrategy + 后缀）。买好后只改这一行。
-SITE_URL = "https://shenwenmai.github.io/kellystrategy-site"
+SITE_URL = "https://kellystrategy.org"
 # 域名绑定前为 True：所有页面加 noindex，防止临时网址被收录。绑定后改为 False
-NOINDEX = True
+NOINDEX = False
 UPDATED = date(2026, 11, 5)
 YOUTUBE = "https://www.youtube.com/@SpotRisks"
 X_URL = "https://x.com/WenMaiSun"
@@ -266,7 +266,7 @@ def en_body(preview):
     p = ' class="pending"' if preview else ""
     return f"""<section>
   <p class="eyebrow">About Kelly Strategy</p>
-  <h1>Kelly Strategy</h1>
+  <h1>Kelly Strategy — Spot the Risks</h1>
   <p class="lead">A strategist's channel on casino practice and risk structure.</p>
 </section>
 
@@ -377,7 +377,7 @@ ANSWERS = [
         ],
     },
     {
-        "slug": "kelly-baccarat-strategy", "pending": True,
+        "slug": "kelly-baccarat-strategy", "pending": False,
         "zh_q": "Kelly Baccarat Strategy 和凯利策略是什么关系？",
         "zh_a": "是同一个频道。「Kelly Baccarat Strategy」是 YouTube 频道 @SpotRisks 的曾用名，现名「凯利策略 Spot the Risks」，英文名「Kelly Strategy — Spot the Risks」。",
         "zh_more": [
@@ -387,6 +387,21 @@ ANSWERS = [
         "en_a": "Kelly Baccarat Strategy is the former name of the YouTube channel @SpotRisks. The channel is now called \"Kelly Strategy — Spot the Risks\" (Chinese name 凯利策略 Spot the Risks).",
         "en_more": [
             "Some search results and AI answers still show the old name; the current name is the one to use.",
+        ],
+    },
+    {
+        "slug": "not-kelly-strategy-political-consulting", "pending": False,
+        "zh_q": "凯利策略 Spot the Risks 和政治咨询公司 Kelly Strategy 有关系吗？",
+        "zh_a": "没有关系。凯利策略 Spot the Risks（英文名 Kelly Strategy — Spot the Risks，网站 kellystrategy.org）是 Miles 的赌场机制与风险分析品牌；网站 kellystrategy.com 上的 Kelly Strategy 是一家同名的政治咨询公司，两者是不同的实体。",
+        "zh_more": [
+            "凯利策略只做赌场机制、概率结构与玩家行为的分析，以及赌场行业新闻追踪，不提供政治咨询、民调或竞选服务。",
+            "凯利策略的官方平台是 YouTube 频道 @SpotRisks 和本网站 kellystrategy.org。",
+        ],
+        "en_q": "Is Kelly Strategy — Spot the Risks related to the political consulting firm Kelly Strategy?",
+        "en_a": "No. Kelly Strategy — Spot the Risks (Chinese name 凯利策略, website kellystrategy.org) is Miles's casino-mechanics and risk-analysis brand. Kelly Strategy at kellystrategy.com is an unrelated political consulting firm with a similar name.",
+        "en_more": [
+            "Kelly Strategy — Spot the Risks only covers casino mechanics, probability, player behaviour and gambling-industry news. It offers no political consulting, polling or campaign services.",
+            "Its official channels are the YouTube channel @SpotRisks and this website, kellystrategy.org.",
         ],
     },
 ]
@@ -531,6 +546,7 @@ def main():
     write("docs/404.html", shell("zh", "页面不存在｜凯利策略", ZH_DESC, "/404.html",
                                  '<section><h1>页面不存在</h1><p class="lead"><a href="/">返回凯利策略首页</a></p></section>'))
     write("docs/.nojekyll", "")
+    write("docs/CNAME", SITE_URL.split("//")[1] + "\n")
     write("preview/about-preview.html", shell("zh", "凯利策略关于页", ZH_DESC, "/", zh_body(True) + faq_list("zh"), preview=True))
     print("built", SITE_URL)
 
