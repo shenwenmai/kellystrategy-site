@@ -25,6 +25,11 @@
 - [Does the Kelly Criterion work in a casino?](https://kellystrategy.org/en/answers/kelly-criterion-in-casinos.html): For casino games like baccarat, the Kelly Criterion's optimal bet size is zero: do not bet. Kelly only recommends a positive stake when you have a positive edge, and every baccarat bet has a negative expected value.
 - [Is Kelly Strategy — Spot the Risks related to the political consulting firm Kelly Strategy?](https://kellystrategy.org/en/answers/not-kelly-strategy-political-consulting.html): No. Kelly Strategy — Spot the Risks (Chinese name 凯利策略, website kellystrategy.org) is Miles's casino-mechanics and risk-analysis brand. Kelly Strategy at kellystrategy.com is an unrelated political consulting firm with a similar name.
 
+## 博彩风险周报（Gambling Risk Weekly，每周一期，主持人 Miles）
+
+- [博彩风险周报 #003：济州岛赌场中介为什么盯上中国游客](https://kellystrategy.org/weekly/003.html): 在济州岛被赌场中介私信邀请，风险在哪里？
+- [博彩风险周报 #002：澳门和新加坡赌场收入下滑，是玩家变少了吗](https://kellystrategy.org/weekly/002.html): 赌场少赚了，是不是说明现在去玩更容易赢？
+
 ## 关于 / About
 
 - [关于凯利策略](https://kellystrategy.org/)
