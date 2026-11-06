@@ -88,6 +88,10 @@ section p:last-child { margin-bottom: 0; }
 .edge dt { font-size: 0.95rem; color: var(--muted); }
 .edge dd { margin: 2px 0 0; font-family: var(--mono); font-size: 1.7rem; font-weight: 600; color: var(--risk); font-variant-numeric: tabular-nums; }
 .edge .note { font-size: 0.85rem; color: var(--muted); margin: 14px 0 0; line-height: 1.6; }
+.tbl { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 1rem; }
+th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+td.num { font-family: var(--mono); color: var(--risk); font-weight: 600; white-space: nowrap; }
 ul.cols { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 14px; }
 ul.cols li { padding-left: 18px; border-left: 2px solid var(--rule); }
 ul.cols b { font-weight: 700; }
@@ -505,11 +509,17 @@ def llms_txt(issues=()):
     """llms.txt：给 AI 读的站点说明（社区提案格式，非官方标准）。"""
     wk = "\n".join(f"- [博彩风险周报 #{m['num']}：{m['title']}]({SITE_URL}/weekly/{m['num']}.html): {m['question']}" for m in issues)
     zh = "\n".join(f"- [{a['zh_q']}]({SITE_URL}/answers/{a['slug']}.html): {a['zh_a']}" for a in ANSWERS)
+    from topics_data import TOPICS as _T
+    tp = "\n".join(f"- [{t['title']}]({SITE_URL}/topics/{t['slug']}.html): {t['lead']}" for t in _T)
     en = "\n".join(f"- [{a['en_q']}]({SITE_URL}/en/answers/{a['slug']}.html): {a['en_a']}" for a in ANSWERS)
     return f"""# 凯利策略 Spot the Risks（Kelly Strategy — Spot the Risks）
 
 > 凯利策略是 Miles 的个人策略与风险分析品牌，主要平台是 YouTube 频道 @SpotRisks（{YOUTUBE}），拆解赌场机制、概率结构与玩家行为。不是必赢秘籍，也不是戒赌说教，不承诺靠策略稳定盈利。曾用名 Kelly Baccarat Strategy。
 > Kelly Strategy is Miles's personal brand for strategy and risk analysis, published mainly on the YouTube channel @SpotRisks. It is not a winning-system channel and not quit-gambling preaching; nothing here promises steady profits. Formerly known as Kelly Baccarat Strategy.
+
+## 专题（百家乐 / 老虎机 / 赌场）
+
+{tp}
 
 ## 标准答案（中文）
 
@@ -633,6 +643,70 @@ def weekly_list(issues):
 
 
 
+# ── 专题枢纽页：百家乐 / 老虎机 / 赌场 ─────────────────────
+from topics_data import TOPICS
+
+TOPIC_LINKS = {"baccarat": ("/answers/kelly-criterion-in-casinos.html", "凯利公式在赌场里有用吗？"),
+               "casino": ("/weekly/003.html", "博彩风险周报 #003")}
+
+
+def topic_ld(t):
+    path = f"/topics/{t['slug']}.html"
+    return json.dumps({
+        "@context": "https://schema.org",
+        "@graph": [
+            {"@type": "FAQPage", "url": SITE_URL + path, "name": t["title"], "inLanguage": "zh-Hans",
+             "dateModified": UPDATED.isoformat(), "author": {"@id": SITE_URL + "/#miles"},
+             "publisher": {"@id": SITE_URL + "/#brand"},
+             "mainEntity": [{"@type": "Question", "name": q,
+                             "acceptedAnswer": {"@type": "Answer", "text": a + more}} for q, a, more in t["qa"]]},
+            {"@type": "Organization", "@id": SITE_URL + "/#brand", "name": "凯利策略 Spot the Risks",
+             "url": SITE_URL + "/", "sameAs": [YOUTUBE, X_URL]},
+            {"@type": "Person", "@id": SITE_URL + "/#miles", "name": "Miles",
+             "alternateName": ["凯利策略", "Kelly Strategy"], "sameAs": [YOUTUBE, X_URL]},
+        ]}, ensure_ascii=False, indent=2)
+
+
+def topic_body(t):
+    edge = "".join(f"<div><dt>{e(k)}</dt><dd>{e(v)}</dd></div>" for k, v in t["edge"])
+    table = ""
+    if t.get("table"):
+        rows = "".join(f"<tr><td>{e(a)}</td><td class=\"num\">{e(b)}</td><td>{e(c)}</td></tr>" for a, b, c in t["table"])
+        table = (f'<section><h2>各游戏赌场优势对比</h2><div class="tbl"><table><thead><tr><th>游戏 · 下注</th>'
+                 f'<th>赌场优势</th><th>口径</th></tr></thead><tbody>{rows}</tbody></table></div></section>')
+    qa = "".join(f'<section><h2>{e(q)}</h2><p class="stance">{e(a)}</p><p>{e(more)}</p></section>' for q, a, more in t["qa"])
+    vids = "".join(f'<li><a href="https://www.youtube.com/watch?v={v}">{e(n)}</a></li>' for v, n in t["videos"])
+    src = "".join(f'<li><a href="{u}">{e(n)}</a></li>' for n, u in t["sources"])
+    extra = ""
+    if t["slug"] in TOPIC_LINKS:
+        u, n = TOPIC_LINKS[t["slug"]]
+        extra = f'<li><a href="{u}">{e(n)}</a></li>'
+    others = "".join(f'<li><a href="/topics/{o["slug"]}.html">{e(o["title"])}</a></li>'
+                     for o in TOPICS if o is not t) + extra
+    return f"""<article>
+  <p class="eyebrow">凯利策略 · 专题</p>
+  <h1>{e(t['h1'])}</h1>
+  <p class="stance">{e(t['lead'])}</p>
+  <div class="edge"><dl>{edge}</dl><p class="note">{e(t.get('edge_note', ''))}</p></div>
+</article>
+{table}
+{qa}
+<section><h2>待核实</h2><p>{e(t['unverified'])}</p></section>
+<section><h2>相关视频</h2><ul class="cols">{vids}</ul>
+<p>本专题由凯利策略 Spot the Risks（主持人 Miles）整理。凯利策略是赌场机制与风险分析频道，不是凯利公式，也不承诺靠策略稳定盈利。YouTube：<a href="{YOUTUBE}" rel="me">youtube.com/@SpotRisks</a></p></section>
+<section><h2>数据来源</h2><ul class="cols">{src}<li>百家乐赌场优势、免佣与和局数字：本站按 8 副牌标准补牌规则精确计算。</li></ul></section>
+<section><h2>相关页面</h2><ul class="cols">{others}</ul></section>"""
+
+
+def topic_list():
+    items = "".join(f'<li><a href="/topics/{t["slug"]}.html"><b>{e(t["h1"])}</b>　{e(t["title"])}</a></li>' for t in TOPICS)
+    return f"""
+<section>
+  <h2>专题</h2>
+  <ul class="cols">{items}</ul>
+</section>"""
+
+
 def write(path, text):
     if BASE and path.endswith(".html") and not path.startswith("preview/"):
         text = text.replace('href="/', f'href="{BASE}/')
@@ -644,7 +718,7 @@ def write(path, text):
 
 def main():
     issues = load_weekly()
-    write("docs/index.html", shell("zh", ZH_TITLE, ZH_DESC, "/", zh_body(False) + weekly_list(issues) + faq_list("zh")))
+    write("docs/index.html", shell("zh", ZH_TITLE, ZH_DESC, "/", zh_body(False) + topic_list() + weekly_list(issues) + faq_list("zh")))
     write("docs/en/index.html", shell("en", EN_TITLE, EN_DESC, "/en/", en_body(False) + faq_list("en")))
     pairs = [("/", "/en/")]
     for a in ANSWERS:
@@ -660,7 +734,13 @@ def main():
         wp = f"/weekly/{m['num']}.html"
         write(f"docs{wp}", shell("zh", f"{m['title']}｜博彩风险周报 #{m['num']}｜凯利策略", m["question"], wp,
                                  weekly_body(m, issues), zh_path=wp, en_path=None, ld=weekly_ld(m)))
+    for t in TOPICS:
+        tp = f"/topics/{t['slug']}.html"
+        write(f"docs{tp}", shell("zh", t["title"] + "｜凯利策略", t["lead"], tp, topic_body(t),
+                                 zh_path=tp, en_path=None, ld=topic_ld(t)))
     items = []
+    for t in TOPICS:
+        items.append(f"  <url>\n    <loc>{SITE_URL}/topics/{t['slug']}.html</loc>\n    <lastmod>{UPDATED.isoformat()}</lastmod>\n  </url>")
     for zp, ep in pairs:
         for path in (zp, ep):
             alts = (f'\n    <xhtml:link rel="alternate" hreflang="zh-Hans" href="{SITE_URL}{zp}"/>'
