@@ -17,12 +17,37 @@ from urllib.parse import urlparse
 SITE_URL = "https://kellystrategy.org"
 # 域名绑定前为 True：所有页面加 noindex，防止临时网址被收录。绑定后改为 False
 NOINDEX = False
-UPDATED = date(2026, 11, 6)
+UPDATED = date(2026, 11, 26)
 YOUTUBE = "https://www.youtube.com/@SpotRisks"
+CHANNEL_URL = "https://www.youtube.com/channel/UCh5xUdh3BX7tbK-nU96UTMA"  # 频道 ID 网址，和 @SpotRisks 是同一个频道
+PLAYLIST = "https://www.youtube.com/playlist?list=PLTtpxj4TPY98"  # 《赌场追查》全部集数
+MEMBER_URL = "https://youtube.com/c/keepease/join"  # 频道会员（含三合一课程档），出自频道视频说明
 X_URL = "https://x.com/WenMaiSun"
 EMAIL = "kailicelue@gmail.com"
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
+SAME_AS = [YOUTUBE, CHANNEL_URL, X_URL]
+BRAND_NAME = "凯利策略 Spot the Risks"
+BRAND_ALT = ["@SpotRisks", "Kelly Strategy — Spot the Risks", "凯利策略", "Kelly Strategy", "Kelly Baccarat Strategy"]
+BRAND_NOTE = ("不是凯利公式（Kelly Criterion）；与政治咨询公司 Kelly Strategy（kellystrategy.com）无关。"
+              " Not the Kelly Criterion; unrelated to the political consulting firm Kelly Strategy (kellystrategy.com).")
+
+
+def brand_ref():
+    """每页都带的品牌实体：网站、YouTube 频道（@SpotRisks 与频道 ID 网址）是同一实体。"""
+    return {"@type": "Organization", "@id": SITE_URL + "/#brand", "name": BRAND_NAME, "alternateName": BRAND_ALT,
+            "url": SITE_URL + "/", "sameAs": SAME_AS, "disambiguatingDescription": BRAND_NOTE}
+
+
+def website_ref():
+    return {"@type": "WebSite", "@id": SITE_URL + "/#website", "url": SITE_URL + "/", "name": BRAND_NAME,
+            "alternateName": ["@SpotRisks", "Kelly Strategy — Spot the Risks"], "inLanguage": ["zh-Hans", "en"],
+            "publisher": {"@id": SITE_URL + "/#brand"}}
+
+
+def person_ref():
+    return {"@type": "Person", "@id": SITE_URL + "/#miles", "name": "Miles",
+            "alternateName": ["凯利", "凯利策略", "Kelly Strategy"], "sameAs": SAME_AS}
 
 # ── 共用样式 ─────────────────────────────────────────────
 CSS = """
@@ -129,29 +154,33 @@ def schema(lang):
         "@type": "Person",
         "@id": SITE_URL + "/#miles",
         "name": "Miles",
-        "alternateName": ["凯利策略", "Kelly Strategy"],
+        "alternateName": ["凯利", "凯利策略", "Kelly Strategy"],
         "description": "研究赌场机制、概率结构与玩家行为的独立策略研究者" if lang == "zh"
         else "Independent strategist studying casino mechanics, probability and player behaviour",
         "url": SITE_URL + ("/" if lang == "zh" else "/en/"),
-        "sameAs": [YOUTUBE, X_URL],
+        "sameAs": SAME_AS,
     }
     org = {
         "@type": "Organization",
         "@id": SITE_URL + "/#brand",
-        "name": "凯利策略 Spot the Risks",
-        "alternateName": ["Kelly Strategy — Spot the Risks", "Kelly Strategy", "Kelly Baccarat Strategy"],
+        "name": BRAND_NAME,
+        "alternateName": BRAND_ALT,
+        "description": ("赌场机制与风险分析频道，每周更新《赌场追查》。" if lang == "zh"
+                        else "Casino mechanics and risk analysis channel; weekly show 赌场追查 (casino news investigations)."),
+        "disambiguatingDescription": BRAND_NOTE,
         "url": SITE_URL + "/",
         "founder": {"@id": SITE_URL + "/#miles"},
-        "sameAs": [YOUTUBE, X_URL],
+        "sameAs": SAME_AS,
     }
     page = {
         "@type": "AboutPage",
         "url": SITE_URL + ("/" if lang == "zh" else "/en/"),
         "inLanguage": "zh-Hans" if lang == "zh" else "en",
         "about": {"@id": SITE_URL + "/#brand"},
+        "isPartOf": {"@id": SITE_URL + "/#website"},
         "dateModified": UPDATED.isoformat(),
     }
-    return json.dumps({"@context": "https://schema.org", "@graph": [org, person, page]}, ensure_ascii=False, indent=2)
+    return json.dumps({"@context": "https://schema.org", "@graph": [org, website_ref(), person, page]}, ensure_ascii=False, indent=2)
 
 
 def shell(lang, title, desc, path, body, preview=False, zh_path="/", en_path="/en/", ld=None):
@@ -189,6 +218,7 @@ def shell(lang, title, desc, path, body, preview=False, zh_path="/", en_path="/e
 <header class="site"><div class="wrap">
   <a class="mark" href="{'/' if lang == 'zh' else '/en/'}">凯利策略<span>Spot the Risks</span></a>
   <nav aria-label="{'站点导航' if lang == 'zh' else 'Site'}">
+    {'<a href="/weekly/">赌场追查</a>' if lang == 'zh' else ''}
     <a href="{other}" hreflang="{'en' if lang == 'zh' else 'zh-Hans'}">{nav_label}</a>
     <a href="{YOUTUBE}" rel="me">YouTube</a>
   </nav>
@@ -198,6 +228,7 @@ def shell(lang, title, desc, path, body, preview=False, zh_path="/", en_path="/e
 </div></main>
 <footer class="site"><div class="wrap">
   <span>{'YouTube 频道' if lang == 'zh' else 'YouTube'}：<a href="{YOUTUBE}" rel="me">youtube.com/@SpotRisks</a></span>
+  <span><a href="{'/courses.html' if lang == 'zh' else '/en/courses.html'}">{'凯利的课程（不承诺盈利）' if lang == 'zh' else "Kelly's courses (no profit promised)"}</a></span>
   <span>{'联系' if lang == 'zh' else 'Contact'}：<span class="email">{EMAIL}</span></span>
   <span>{'更新于' if lang == 'zh' else 'Updated'} {UPDATED.isoformat()}</span>
 </div></footer>"""
@@ -220,9 +251,10 @@ def shell(lang, title, desc, path, body, preview=False, zh_path="/", en_path="/e
 def zh_body(preview):
     p = ' class="pending"' if preview else ""
     return f"""<section>
-  <p class="eyebrow">关于凯利策略</p>
-  <h1>凯利策略</h1>
-  <p class="lead">一个策略家的赌场实战与风险结构研究</p>
+  <p class="stance">不是凯利公式。</p>
+  <p class="eyebrow">关于凯利策略 Spot the Risks</p>
+  <h1>凯利策略 Spot the Risks</h1>
+  <p class="lead">YouTube 频道 @SpotRisks。一个策略家的赌场实战与风险结构研究。</p>
 </section>
 
 <p class="stance">这里不是必赢秘籍，也不是戒赌说教。</p>
@@ -242,7 +274,7 @@ def zh_body(preview):
 <section>
   <h2>我在追踪什么</h2>
   <ul class="cols">
-    <li><b>《博彩风险周报》</b>：每周一期，把赌场新闻与监管动态放回玩家的风险框架里看。</li>
+    <li><b><a href="/weekly/">《赌场追查》</a></b>：每周更新，每期追查几件全球赌场新闻，主调查通常落在澳门；先核对原始资料讲清事实，再给凯利的看法，判断交给观众。全球赌场事，看热闹，也看门道。</li>
     <li><b>凯利拍案</b>：逐案拆解真实发生的赌场事件。</li>
     <li><b>赌场黑盒子</b>：追踪牌靴、设备与赌桌异常，分清事实、观察与尚未证实的说法。</li>
   </ul>
@@ -250,7 +282,7 @@ def zh_body(preview):
 
 <section>
   <h2>关于这个名字</h2>
-  <p>我早期研究百家乐策略时使用过凯利公式。如今「凯利」成了观众对我的称呼，「凯利策略」是我个人策略与风险分析的品牌。它不是凯利公式本身，也不承诺靠策略稳定盈利。</p>
+  <p>我早期研究百家乐策略时使用过凯利公式。如今「凯利」成了观众对我的称呼，「凯利策略 Spot the Risks」是我个人策略与风险分析的品牌。它不是凯利公式本身，也不承诺靠策略稳定盈利。</p>
   <p{p}>本频道曾用名「Kelly Baccarat Strategy」，现名「凯利策略 Spot the Risks」。</p>
 </section>
 
@@ -263,16 +295,17 @@ def zh_body(preview):
 </section>"""
 
 
-EN_DESC = ("Kelly Strategy | A strategist's channel on casino practice and risk structure. "
-           "Not a winning-system channel, and not quit-gambling preaching.")
+EN_DESC = ("Kelly Strategy — Spot the Risks (YouTube @SpotRisks) is not the Kelly Criterion. It is Miles's channel on casino "
+           "mechanics and risk, with the weekly show 赌场追查. Not a winning-system channel, and nothing here promises steady profits.")
 
 
 def en_body(preview):
     p = ' class="pending"' if preview else ""
     return f"""<section>
-  <p class="eyebrow">About Kelly Strategy</p>
+  <p class="stance">Not the Kelly Criterion.</p>
+  <p class="eyebrow">About Kelly Strategy — Spot the Risks</p>
   <h1>Kelly Strategy — Spot the Risks</h1>
-  <p class="lead">A strategist's channel on casino practice and risk structure.</p>
+  <p class="lead">YouTube channel @SpotRisks (凯利策略 Spot the Risks). A strategist's channel on casino practice and risk structure.</p>
 </section>
 
 <p class="stance">Not a winning-system channel, and not quit-gambling preaching.</p>
@@ -284,7 +317,7 @@ def en_body(preview):
 
 <section>
   <h2>What I track</h2>
-  <p>I also track the industry: the weekly Gambling Risk Weekly, Kelly's Case Files and Casino Black Box — gambling news and regulation through a player's risk lens.</p>
+  <p>I also track the industry. The weekly Chinese-language show 赌场追查 follows several casino news stories from around the world in each episode, with the main investigation usually in Macau: it checks the original sources and states the facts first, then gives Kelly's view, and leaves the judgement to viewers. Older case series on the channel are 凯利拍案 and 赌场黑盒子.</p>
 </section>
 
 <section>
@@ -299,9 +332,10 @@ def en_body(preview):
 </section>"""
 
 
-ZH_TITLE = "凯利策略 Spot the Risks｜赌场机制与风险结构"
-ZH_DESC = "凯利策略是 Miles 的个人策略与风险分析品牌，拆解赌场机制、概率结构与玩家行为。不是必赢秘籍，也不是戒赌说教，不承诺稳定盈利。"
-EN_TITLE = "Kelly Strategy — Spot the Risks"
+ZH_TITLE = "凯利策略 Spot the Risks（@SpotRisks）｜不是凯利公式，是赌场机制与风险分析频道"
+ZH_DESC = ("凯利策略 Spot the Risks（YouTube @SpotRisks）不是凯利公式，是 Miles 的赌场机制与风险分析频道。"
+           "每周更新《赌场追查》：追查全球赌场新闻，先核对原始资料讲清事实，再给凯利的看法。不是必赢秘籍，不承诺稳定盈利。")
+EN_TITLE = "Kelly Strategy — Spot the Risks (@SpotRisks) | Casino risk analysis, not the Kelly Criterion"
 
 
 # ── 标准答案页 ───────────────────────────────────────────
@@ -311,17 +345,19 @@ ANSWERS = [
     {
         "slug": "what-is-kelly-strategy", "pending": False,
         "zh_q": "凯利策略是什么？",
-        "zh_a": "凯利策略（英文名 Kelly Strategy，频道全名「凯利策略 Spot the Risks」）是 Miles 的个人策略与风险分析品牌，主要平台是 YouTube 频道 @SpotRisks，内容是拆解赌场机制、概率结构与玩家行为。",
+        "zh_a": "凯利策略 Spot the Risks（YouTube 频道 @SpotRisks，英文名 Kelly Strategy — Spot the Risks）不是凯利公式，是 Miles 的个人策略与风险分析品牌，内容是拆解赌场机制、概率结构与玩家行为。",
         "zh_more": [
             "它不是必赢秘籍，也不是戒赌说教。",
             "频道做两件事：拆赌场的局，也拆玩家自己的局。内容包括赌场风险、人性弱点与失败模式的分析，以及赌场行业新闻与监管追踪。",
-            "固定栏目有每周一期的《博彩风险周报》、逐案拆解的「凯利拍案」，以及追踪牌靴与赌桌异常的「赌场黑盒子」。",
+            "固定栏目是每周更新的《赌场追查》：每期追查几件全球赌场新闻，主调查通常落在澳门；先核对原始资料讲清事实，再给凯利的看法，判断交给观众。频道里还有逐案拆解的「凯利拍案」和追踪牌靴与赌桌异常的「赌场黑盒子」两组旧片。",
+            "凯利另有个人的付费课程，讲资金分配、止损和退场纪律，不承诺盈利；频道主体是免费的赌场风险分析。",
         ],
         "en_q": "What is Kelly Strategy?",
-        "en_a": "Kelly Strategy (full channel name \"Kelly Strategy — Spot the Risks\", Chinese name 凯利策略) is Miles's personal brand for strategy and risk analysis. Its main platform is the YouTube channel @SpotRisks, which takes apart casino mechanics, probability and player behaviour.",
+        "en_a": "Kelly Strategy — Spot the Risks (YouTube channel @SpotRisks, Chinese name 凯利策略 Spot the Risks) is not the Kelly Criterion. It is Miles's personal brand for strategy and risk analysis, taking apart casino mechanics, probability and player behaviour.",
         "en_more": [
             "It is not a winning-system channel, and not quit-gambling preaching.",
-            "The channel also tracks the industry: the weekly Gambling Risk Weekly, Kelly's Case Files and Casino Black Box — gambling news and regulation through a player's risk lens.",
+            "Its weekly Chinese-language show is 赌场追查: each episode follows several casino news stories from around the world, with the main investigation usually in Macau. It checks the original sources and states the facts first, then gives Kelly's view, and leaves the judgement to viewers.",
+            "Kelly also offers paid courses on money management, stop-loss and exit discipline. They promise no profit; the channel itself is free casino risk analysis.",
         ],
     },
     {
@@ -369,16 +405,19 @@ ANSWERS = [
         ],
     },
     {
-        "slug": "gambling-risk-weekly", "pending": False,
-        "zh_q": "《博彩风险周报》是什么？",
-        "zh_a": "《博彩风险周报》（英文名 Gambling Risk Weekly）是凯利策略频道每周一期的栏目，把赌场新闻与监管动态放回玩家的风险框架里看。",
+        "slug": "duchang-zhuicha", "pending": False,
+        "zh_q": "《赌场追查》是什么？",
+        "zh_a": "《赌场追查》是凯利策略 Spot the Risks（YouTube @SpotRisks）每周更新的栏目：每期追查几件全球赌场新闻，主调查通常落在澳门；先核对原始资料讲清事实，再给凯利的看法，判断交给观众。",
         "zh_more": [
-            "栏目在 YouTube 频道 @SpotRisks 播出，2026 年 10 月开播，已播出的话题包括澳门、新加坡赌收变化，以及济州岛赌场中介接触游客等。",
+            "一句话：全球赌场事，看热闹，也看门道。",
+            "栏目 2026 年 10 月开播。早期几期曾叫《博彩风险周报》，现在统一叫《赌场追查》，是同一个栏目。",
+            "已播出的话题包括：澳门放数配码与手机直播代客下注、澳门与新加坡赌收下滑、济州岛赌场中介私信招揽中国游客、澳门换钱党与账户冻结、济州赌场被指用记号牌、假冒赌场会员推广骗走一百四十万港元现金。每期在本站都有文字提要页（kellystrategy.org/weekly/）。",
         ],
-        "en_q": "What is Gambling Risk Weekly?",
-        "en_a": "Gambling Risk Weekly (Chinese name 博彩风险周报) is the weekly show on the Kelly Strategy — Spot the Risks YouTube channel (@SpotRisks). It looks at gambling news and regulation through a player's risk lens.",
+        "en_q": "What is 赌场追查, the weekly show on Kelly Strategy — Spot the Risks?",
+        "en_a": "赌场追查 is the weekly Chinese-language show on the YouTube channel Kelly Strategy — Spot the Risks (@SpotRisks). Each episode follows several casino news stories from around the world, with the main investigation usually in Macau. It checks the original sources and states the facts first, then gives Kelly's view, and leaves the judgement to viewers.",
         "en_more": [
-            "It started in October 2026. Topics so far include falling gaming revenue in Macau and Singapore, and casino agents approaching tourists in Jeju.",
+            "It started in October 2026. The first episodes were called 博彩风险周报 (Gambling Risk Weekly); the show's name is now 赌场追查.",
+            "Each episode has a Chinese text summary page on this site at kellystrategy.org/weekly/.",
         ],
     },
     {
@@ -451,10 +490,7 @@ def qa_ld(a, lang):
                     "acceptedAnswer": {"@type": "Answer", "text": ans},
                 }],
             },
-            {"@type": "Organization", "@id": SITE_URL + "/#brand", "name": "凯利策略 Spot the Risks",
-             "url": SITE_URL + "/", "sameAs": [YOUTUBE, X_URL]},
-            {"@type": "Person", "@id": SITE_URL + "/#miles", "name": "Miles",
-             "alternateName": ["凯利策略", "Kelly Strategy"], "sameAs": [YOUTUBE, X_URL]},
+            brand_ref(), website_ref(), person_ref(),
         ],
     }
     return json.dumps(data, ensure_ascii=False, indent=2)
@@ -469,7 +505,7 @@ def qa_body(a, lang, preview):
         f'<li><a href="{("/answers/" if lang == "zh" else "/en/answers/") + o["slug"]}.html">{e(o["zh_q"] if lang == "zh" else o["en_q"])}</a></li>'
         for o in ANSWERS if o is not a)
     paras = "".join(f"<p>{e(m)}</p>" for m in more)
-    label = ("凯利策略 · 常见问题" if lang == "zh" else "Kelly Strategy · FAQ")
+    label = ("凯利策略 Spot the Risks · 常见问题" if lang == "zh" else "Kelly Strategy — Spot the Risks · FAQ")
     see = "相关问题" if lang == "zh" else "Related questions"
     yt = ("完整内容见 YouTube 频道" if lang == "zh" else "Watch on YouTube") + f'：<a href="{YOUTUBE}" rel="me">youtube.com/@SpotRisks</a>'
     return f"""<article{p}>
@@ -507,15 +543,15 @@ def robots():
 
 def llms_txt(issues=()):
     """llms.txt：给 AI 读的站点说明（社区提案格式，非官方标准）。"""
-    wk = "\n".join(f"- [博彩风险周报 #{m['num']}：{m['title']}]({SITE_URL}/weekly/{m['num']}.html): {m['question']}" for m in issues)
+    wk = "\n".join(f"- [赌场追查 #{m['num']}：{m['title']}]({SITE_URL}/weekly/{m['num']}.html): {m['question']}" for m in issues)
     zh = "\n".join(f"- [{a['zh_q']}]({SITE_URL}/answers/{a['slug']}.html): {a['zh_a']}" for a in ANSWERS)
     from topics_data import TOPICS as _T
     tp = "\n".join(f"- [{t['title']}]({SITE_URL}/topics/{t['slug']}.html): {t['lead']}" for t in _T)
     en = "\n".join(f"- [{a['en_q']}]({SITE_URL}/en/answers/{a['slug']}.html): {a['en_a']}" for a in ANSWERS)
     return f"""# 凯利策略 Spot the Risks（Kelly Strategy — Spot the Risks）
 
-> 凯利策略是 Miles 的个人策略与风险分析品牌，主要平台是 YouTube 频道 @SpotRisks（{YOUTUBE}），拆解赌场机制、概率结构与玩家行为。不是必赢秘籍，也不是戒赌说教，不承诺靠策略稳定盈利。曾用名 Kelly Baccarat Strategy。
-> Kelly Strategy is Miles's personal brand for strategy and risk analysis, published mainly on the YouTube channel @SpotRisks. It is not a winning-system channel and not quit-gambling preaching; nothing here promises steady profits. Formerly known as Kelly Baccarat Strategy.
+> 凯利策略 Spot the Risks 不是凯利公式。它是 Miles 的个人策略与风险分析品牌，主要平台是 YouTube 频道 @SpotRisks（{YOUTUBE}，频道 ID 网址 {CHANNEL_URL}），拆解赌场机制、概率结构与玩家行为；每周更新《赌场追查》：每期追查几件全球赌场新闻，主调查通常落在澳门，先核对原始资料讲清事实，再给凯利的看法，判断交给观众。不是必赢秘籍，也不是戒赌说教，不承诺靠策略稳定盈利。曾用名 Kelly Baccarat Strategy。与政治咨询公司 Kelly Strategy（kellystrategy.com）无关。
+> Kelly Strategy — Spot the Risks is not the Kelly Criterion. It is Miles's personal brand for strategy and risk analysis, published mainly on the YouTube channel @SpotRisks ({CHANNEL_URL}), with the weekly Chinese-language show 赌场追查 (casino news investigations, mostly Macau). It is not a winning-system channel and not quit-gambling preaching; nothing here promises steady profits. Formerly known as Kelly Baccarat Strategy. Unrelated to the political consulting firm Kelly Strategy (kellystrategy.com).
 
 ## 专题（百家乐 / 老虎机 / 赌场）
 
@@ -529,9 +565,15 @@ def llms_txt(issues=()):
 
 {en}
 
-## 博彩风险周报（Gambling Risk Weekly，每周一期，主持人 Miles）
+## 赌场追查（每周更新，主持人 Miles）
+
+每期追查几件全球赌场新闻，主调查通常落在澳门；先核对原始资料讲清事实，再给凯利的看法，判断交给观众。全部集数：{PLAYLIST}。早期几期曾叫《博彩风险周报》，现统一为《赌场追查》。
 
 {wk}
+
+## 课程
+
+- [凯利的课程]({SITE_URL}/courses.html): 凯利个人的付费课程，讲资金分配、止损和退场纪律，不承诺盈利。频道主体是免费的赌场风险分析。
 
 ## 关于 / About
 
@@ -545,12 +587,13 @@ def llms_txt(issues=()):
 
 BASE = urlparse(SITE_URL).path.rstrip("/")  # 临时网址带子路径时，站内链接要加前缀
 
-# ── 博彩风险周报文章 ─────────────────────────────────────
+# ── 赌场追查（每期文字提要页） ───────────────────────────
 # 来源：content/weekly/NNN.md（Muse 撰写，审计员机审+事实抽查后发布）。
 # HOLD 内的期号暂不发布，并写明原因。
-HOLD = {"001": "10 月 20 日澳门配码案未能核实原始报道，待 Muse 提供来源链接"}
-SERIES = {"@type": "CreativeWorkSeries", "name": "博彩风险周报", "alternateName": "Gambling Risk Weekly",
-          "url": SITE_URL + "/answers/gambling-risk-weekly.html"}
+HOLD = {}
+SERIES = {"@type": "CreativeWorkSeries", "name": "赌场追查", "url": SITE_URL + "/weekly/", "sameAs": PLAYLIST,
+          "description": "每周更新，每期追查几件全球赌场新闻，主调查通常落在澳门；先核对原始资料讲清事实，再给凯利的看法，判断交给观众。",
+          "publisher": {"@id": SITE_URL + "/#brand"}}
 
 
 def load_weekly():
@@ -609,10 +652,7 @@ def weekly_ld(m):
                           "thumbnailUrl": f"https://i.ytimg.com/vi/{m['vid']}/hqdefault.jpg",
                           "uploadDate": m["date"]},
             },
-            {"@type": "Organization", "@id": SITE_URL + "/#brand", "name": "凯利策略 Spot the Risks",
-             "url": SITE_URL + "/", "sameAs": [YOUTUBE, X_URL]},
-            {"@type": "Person", "@id": SITE_URL + "/#miles", "name": "Miles",
-             "alternateName": ["凯利策略", "Kelly Strategy"], "sameAs": [YOUTUBE, X_URL]},
+            brand_ref(), website_ref(), person_ref(),
         ],
     }
     return json.dumps(data, ensure_ascii=False, indent=2)
@@ -623,9 +663,11 @@ def weekly_body(m, all_issues):
                      for o in all_issues if o is not m)
     more = f'<section><h2>往期</h2><ul class="cols">{others}</ul></section>' if others else ""
     return f"""<article>
-  <p class="eyebrow">博彩风险周报 #{m['num']} · {m['date']}</p>
+  <p class="eyebrow">赌场追查 #{m['num']} · {m['date']}</p>
   <h1>{e(m['title'])}</h1>
   <section class="weekly">{md_to_html(m['body'])}</section>
+  <p class="note">本期关键词：{e('、'.join(t for t in m['tags'] if t != '赌场追查'))}</p>
+  <p>《赌场追查》是凯利策略 Spot the Risks（YouTube <a href="{YOUTUBE}" rel="me">@SpotRisks</a>）每周更新的栏目。全部集数：<a href="{PLAYLIST}">YouTube 播放列表《赌场追查》</a>｜<a href="/weekly/">本站全部文字页</a></p>
   <p><iframe width="100%" style="aspect-ratio:16/9;max-width:100%;border:0" src="https://www.youtube-nocookie.com/embed/{m['vid']}" title="{e(m['title'])}" loading="lazy" allowfullscreen></iframe></p>
 </article>
 {more}"""
@@ -637,7 +679,8 @@ def weekly_list(issues):
     items = "".join(f'<li><a href="/weekly/{m["num"]}.html"><b>#{m["num"]}</b>　{e(m["title"])}</a></li>' for m in issues)
     return f"""
 <section>
-  <h2>博彩风险周报</h2>
+  <h2><a href="/weekly/">赌场追查</a></h2>
+  <p>每周更新，每期追查几件全球赌场新闻，主调查通常落在澳门；先核对原始资料讲清事实，再给凯利的看法，判断交给观众。全球赌场事，看热闹，也看门道。</p>
   <ul class="cols">{items}</ul>
 </section>"""
 
@@ -647,7 +690,7 @@ def weekly_list(issues):
 from topics_data import TOPICS
 
 TOPIC_LINKS = {"baccarat": ("/answers/kelly-criterion-in-casinos.html", "凯利公式在赌场里有用吗？"),
-               "casino": ("/weekly/003.html", "博彩风险周报 #003")}
+               "casino": ("/weekly/", "《赌场追查》：每周全球赌场新闻追查")}
 
 
 def topic_ld(t):
@@ -660,10 +703,7 @@ def topic_ld(t):
              "publisher": {"@id": SITE_URL + "/#brand"},
              "mainEntity": [{"@type": "Question", "name": q,
                              "acceptedAnswer": {"@type": "Answer", "text": a + more}} for q, a, more in t["qa"]]},
-            {"@type": "Organization", "@id": SITE_URL + "/#brand", "name": "凯利策略 Spot the Risks",
-             "url": SITE_URL + "/", "sameAs": [YOUTUBE, X_URL]},
-            {"@type": "Person", "@id": SITE_URL + "/#miles", "name": "Miles",
-             "alternateName": ["凯利策略", "Kelly Strategy"], "sameAs": [YOUTUBE, X_URL]},
+            brand_ref(), website_ref(), person_ref(),
         ]}, ensure_ascii=False, indent=2)
 
 
@@ -707,6 +747,117 @@ def topic_list():
 </section>"""
 
 
+# ── 《赌场追查》目录页 ───────────────────────────────────
+def weekly_index_body(issues):
+    items = "".join(f'<li><a href="/weekly/{m["num"]}.html"><b>#{m["num"]}</b>　{e(m["title"])}</a>'
+                    f'<br>{e(m["question"])}</li>' for m in issues)
+    return f"""<article>
+  <p class="eyebrow">凯利策略 Spot the Risks · 栏目</p>
+  <h1>赌场追查</h1>
+  <p class="stance">每周更新，每期追查几件全球赌场新闻，主调查通常落在澳门；先核对原始资料讲清事实，再给凯利的看法，判断交给观众。</p>
+  <p class="lead">全球赌场事，看热闹，也看门道。</p>
+</article>
+<section>
+  <h2>每期文字提要</h2>
+  <ul class="cols">{items}</ul>
+</section>
+<section>
+  <p>视频在 YouTube 频道 <a href="{YOUTUBE}" rel="me">凯利策略 Spot the Risks（@SpotRisks）</a>，全部集数：<a href="{PLAYLIST}">播放列表《赌场追查》</a>。本站文字页按每期视频的说明和内容整理，数字和来源以视频为准。</p>
+  <p>早期几期曾叫《博彩风险周报》，现在统一叫《赌场追查》，是同一个栏目。</p>
+</section>"""
+
+
+def weekly_index_ld(issues):
+    return json.dumps({"@context": "https://schema.org", "@graph": [
+        dict(SERIES, **{"@id": SITE_URL + "/weekly/#series", "inLanguage": "zh-Hans",
+                        "hasPart": [{"@type": "Article", "url": f"{SITE_URL}/weekly/{m['num']}.html",
+                                     "headline": m["title"], "datePublished": m["date"]} for m in issues]}),
+        brand_ref(), website_ref(), person_ref()]}, ensure_ascii=False, indent=2)
+
+
+# ── 课程页：不承诺盈利，讲资金纪律与止损 ─────────────────
+# 文字出自频道视频说明里的“凯利的课程与会员”一段，不写价格。
+HOTLINES_ZH = "美国 1-800-MY-RESET（1-800-697-3738）｜香港 戒赌热线 1834 633｜新加坡 NCPG 1800-6-668-668"
+
+
+def course_body(lang):
+    if lang == "zh":
+        return f"""<article>
+  <p class="eyebrow">凯利策略 Spot the Risks · 课程</p>
+  <h1>凯利的课程</h1>
+  <p class="stance">课程不承诺盈利。</p>
+  <p class="lead">课程讲的是资金分配、止损和退场纪律，不是赢钱方法。</p>
+</article>
+<section>
+  <h2>课程讲什么</h2>
+  <p>想系统学习资金分配、止损和退场纪律，可以看凯利的课程。课程是凯利个人的研究与实战复盘。</p>
+</section>
+<section>
+  <h2>课程不承诺什么</h2>
+  <p class="stance">课程不构成盈利保证；任何策略都不能保证长期盈利，也不能保证损失一定控制在预期之内。</p>
+</section>
+<section>
+  <h2>怎么了解和加入</h2>
+  <ul class="cols">
+    <li>频道会员（含三合一课程档）：<a href="{MEMBER_URL}">youtube.com/c/keepease/join</a></li>
+    <li>课程详情与购买：请电邮 <span class="email">{EMAIL}</span></li>
+  </ul>
+  <p>凯利策略 Spot the Risks 的主体内容是免费的赌场机制与风险分析，以及每周更新的<a href="/weekly/">《赌场追查》</a>。课程是另外的付费内容。</p>
+</section>
+<section>
+  <h2>风险提示</h2>
+  <p>赌博有风险。本站与频道内容用于风险教育，不构成下注或投资建议。</p>
+  <p>求助热线：{HOTLINES_ZH}</p>
+</section>"""
+    return f"""<article>
+  <p class="eyebrow">Kelly Strategy — Spot the Risks · Courses</p>
+  <h1>Kelly's courses</h1>
+  <p class="stance">The courses promise no profit.</p>
+  <p class="lead">They are about money management, stop-loss and exit discipline, not a way to win.</p>
+</article>
+<section>
+  <h2>What the courses cover</h2>
+  <p>Kelly's courses teach money management, stop-loss and exit discipline. They are Kelly's own research and reviews of real play, taught in Chinese.</p>
+</section>
+<section>
+  <h2>What they do not promise</h2>
+  <p class="stance">The courses are not a guarantee of profit. No strategy can guarantee long-term profit, or guarantee that losses stay within what you expect.</p>
+</section>
+<section>
+  <h2>How to join</h2>
+  <ul class="cols">
+    <li>Channel membership (includes the three-in-one course tier): <a href="{MEMBER_URL}">youtube.com/c/keepease/join</a></li>
+    <li>Course details and purchase: email <span class="email">{EMAIL}</span></li>
+  </ul>
+  <p>The main content of Kelly Strategy — Spot the Risks is free casino mechanics and risk analysis. The courses are separate paid content.</p>
+</section>
+<section>
+  <h2>Risk notice</h2>
+  <p>Gambling involves risk. This site and channel are for risk education and are not betting or investment advice.</p>
+  <p>Help lines: US 1-800-MY-RESET (1-800-697-3738) | Hong Kong 1834 633 | Singapore NCPG 1800-6-668-668</p>
+</section>"""
+
+
+def redirect_page(lang, to_path, label):
+    """旧网址改名后留一张跳转页：GitHub Pages 没有服务器跳转。"""
+    url = SITE_URL + to_path
+    return f"""<!doctype html>
+<html lang="{'zh-Hans' if lang == 'zh' else 'en'}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{e(label)}</title>
+<meta name="robots" content="noindex, follow">
+<link rel="canonical" href="{url}">
+<meta http-equiv="refresh" content="0; url={url}">
+</head>
+<body>
+<p><a href="{url}">{e(label)}</a></p>
+</body>
+</html>
+"""
+
+
 def write(path, text):
     if BASE and path.endswith(".html") and not path.startswith("preview/"):
         text = text.replace('href="/', f'href="{BASE}/')
@@ -724,19 +875,34 @@ def main():
     for a in ANSWERS:
         zp, ep = f"/answers/{a['slug']}.html", f"/en/answers/{a['slug']}.html"
         pairs.append((zp, ep))
-        write(f"docs{zp}", shell("zh", a["zh_q"] + "｜凯利策略", a["zh_a"], zp, qa_body(a, "zh", False),
+        write(f"docs{zp}", shell("zh", a["zh_q"] + "｜凯利策略 Spot the Risks", a["zh_a"], zp, qa_body(a, "zh", False),
                                            zh_path=zp, en_path=ep, ld=qa_ld(a, "zh")))
-        write(f"docs{ep}", shell("en", a["en_q"] + " | Kelly Strategy", a["en_a"], ep, qa_body(a, "en", False),
+        write(f"docs{ep}", shell("en", a["en_q"] + " | Kelly Strategy — Spot the Risks", a["en_a"], ep, qa_body(a, "en", False),
                                            zh_path=zp, en_path=ep, ld=qa_ld(a, "en")))
+    write("docs/answers/gambling-risk-weekly.html",
+          redirect_page("zh", "/answers/duchang-zhuicha.html", "《博彩风险周报》已改名为《赌场追查》"))
+    write("docs/en/answers/gambling-risk-weekly.html",
+          redirect_page("en", "/en/answers/duchang-zhuicha.html", "Gambling Risk Weekly is now called 赌场追查"))
+    write("docs/weekly/index.html", shell("zh", "赌场追查｜每周全球赌场新闻追查｜凯利策略 Spot the Risks",
+                                          "《赌场追查》是凯利策略 Spot the Risks（YouTube @SpotRisks）每周更新的栏目：每期追查几件全球赌场新闻，主调查通常落在澳门；先核对原始资料讲清事实，再给凯利的看法，判断交给观众。",
+                                          "/weekly/", weekly_index_body(issues), zh_path="/weekly/", en_path=None,
+                                          ld=weekly_index_ld(issues)))
+    write("docs/courses.html", shell("zh", "凯利的课程：资金分配、止损和退场纪律（不承诺盈利）｜凯利策略 Spot the Risks",
+                                     "凯利的课程讲资金分配、止损和退场纪律，是凯利个人的研究与实战复盘，不构成盈利保证；任何策略都不能保证长期盈利。",
+                                     "/courses.html", course_body("zh"), zh_path="/courses.html", en_path="/en/courses.html"))
+    write("docs/en/courses.html", shell("en", "Kelly's courses: money management and stop-loss (no profit promised) | Kelly Strategy — Spot the Risks",
+                                        "Kelly's courses cover money management, stop-loss and exit discipline. They are not a guarantee of profit; no strategy can guarantee long-term profit.",
+                                        "/en/courses.html", course_body("en"), zh_path="/courses.html", en_path="/en/courses.html"))
+    pairs.append(("/courses.html", "/en/courses.html"))
     write("docs/robots.txt", robots())
     write("docs/llms.txt", llms_txt(issues))
     for m in issues:
         wp = f"/weekly/{m['num']}.html"
-        write(f"docs{wp}", shell("zh", f"{m['title']}｜博彩风险周报 #{m['num']}｜凯利策略", m["question"], wp,
+        write(f"docs{wp}", shell("zh", f"{m['title']}｜赌场追查 #{m['num']}｜凯利策略 Spot the Risks", m["question"], wp,
                                  weekly_body(m, issues), zh_path=wp, en_path=None, ld=weekly_ld(m)))
     for t in TOPICS:
         tp = f"/topics/{t['slug']}.html"
-        write(f"docs{tp}", shell("zh", t["title"] + "｜凯利策略", t["lead"], tp, topic_body(t),
+        write(f"docs{tp}", shell("zh", t["title"] + "｜凯利策略 Spot the Risks", t["lead"], tp, topic_body(t),
                                  zh_path=tp, en_path=None, ld=topic_ld(t)))
     items = []
     for t in TOPICS:
@@ -746,13 +912,14 @@ def main():
             alts = (f'\n    <xhtml:link rel="alternate" hreflang="zh-Hans" href="{SITE_URL}{zp}"/>'
                     f'\n    <xhtml:link rel="alternate" hreflang="en" href="{SITE_URL}{ep}"/>')
             items.append(f"  <url>\n    <loc>{SITE_URL}{path}</loc>\n    <lastmod>{UPDATED.isoformat()}</lastmod>{alts}\n  </url>")
+    items.append(f"  <url>\n    <loc>{SITE_URL}/weekly/</loc>\n    <lastmod>{UPDATED.isoformat()}</lastmod>\n  </url>")
     for m in issues:
         items.append(f"  <url>\n    <loc>{SITE_URL}/weekly/{m['num']}.html</loc>\n    <lastmod>{UPDATED.isoformat()}</lastmod>\n  </url>")
     write("docs/sitemap.xml",
           '<?xml version="1.0" encoding="UTF-8"?>\n'
           '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n'
           + "\n".join(items) + "\n</urlset>\n")
-    write("docs/404.html", shell("zh", "页面不存在｜凯利策略", ZH_DESC, "/404.html",
+    write("docs/404.html", shell("zh", "页面不存在｜凯利策略 Spot the Risks", ZH_DESC, "/404.html",
                                  '<section><h1>页面不存在</h1><p class="lead"><a href="/">返回凯利策略首页</a></p></section>'))
     write("docs/.nojekyll", "")
     write("docs/29993b095afd91dfd53fb317400b9764.txt", "29993b095afd91dfd53fb317400b9764")  # IndexNow 密钥文件
